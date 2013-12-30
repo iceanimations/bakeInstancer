@@ -70,8 +70,7 @@ def get_particle_grp(inst_main_grp, pid):
     transform node to hold all the instances under a particle '''
     particle_grp = 'particle_' + str(int(pid)) + '_Grp'
     particle_grp_fp = '|' + inst_main_grp + '|' + particle_grp
-    if ((not mc.objExists(particle_grp_fp)) or
-            mc.nodeType(particle_grp_fp) != 'transform'):
+    if ((not mc.objExists(particle_grp_fp)) or mc.nodeType(particle_grp_fp) != 'transform'):
         return mc.createNode('transform', n=particle_grp, p=inst_main_grp)
     return particle_grp_fp
 
@@ -125,9 +124,8 @@ def bake_particle_inst(inst):
         si_array = om.MIntArray()
         pi_array = om.MIntArray()
         inst_fn.allInstances(dp_array, mat_array, si_array, pi_array)
-        pid_array = mc.getParticleAttr(inst_particle,
-                                       at='particleId',
-                                       array=True)
+        rel_mat_array = [dp_array[i].inclusiveMatrix() for i in range(dp_array.length())]
+        pid_array = mc.getParticleAttr(inst_particle, at='particleId', array=True)
         if not pid_array:
             pid_array = []
 
@@ -146,6 +144,7 @@ def bake_particle_inst(inst):
             mat = mat_array[index]
             pi = pi_array[si:ei+1]
             dps = [dp_array[x] for x in pi]
+            rel_mats = [rel_mat_array[x] for x in pi]
 
             # get group for this particle
             particle_grp = ''
@@ -161,51 +160,55 @@ def bake_particle_inst(inst):
             tfn.set(om.MTransformationMatrix(mat))
             mc.setAttr(particle_grp + '.v', 1)
             mc.setKeyframe([particle_grp], bd=0, hi='none', cp=0, s=0)
+            mc.setKeyframe([particle_grp], bd=0, hi='none', cp=0, s=0, at='shear')
 
             # and hide it before this frame if there was no other keys
-            if not mc.keyframe(particle_grp, q=1, at='v',
-                               t=(mc.playbackOptions(q=1, ast=1),
-                                  mc.currentTime(q=1)-1)):
-                mc.setKeyframe([particle_grp], at='v', t=mc.currentTime(q=1)-1,
-                               v=0, hi='none', s=0)
+            if not mc.keyframe(particle_grp, q=1, at='v', t=(mc.playbackOptions(q=1, ast=1), mc.currentTime(q=1)-1)):
+                mc.setKeyframe([particle_grp], at='v', t=mc.currentTime(q=1)-1, v=0, hi='none', s=0)
 
             # and add to its children the correspoding instances
             p_inst_grps = set()
-            for dp in dps:
+            for i, dp in enumerate( dps ):
                 #mechanism to find out existing instance copies for particle
                 try:
                     particle_inst_group = pid_insts[(pid, dp.fullPathName())]
                 except KeyError:
-                    particle_inst_group = get_particle_inst_grp(particle_grp,
-                                                                dp)
+                    particle_inst_group = get_particle_inst_grp(particle_grp, dp)
                     pid_insts[(pid, dp.fullPathName())] = particle_inst_group
                 p_inst_grps.add(particle_inst_group)
 
+                # transform, make visible and key the particle-instance group
+                if not mc.keyframe(particle_inst_group, q=1, at='v', t=(mc.playbackOptions(q=1, ast=1), mc.currentTime(q=1)-1)):
+                    mc.setKeyframe([particle_inst_group], at='v', t=mc.currentTime(q=1)-1, v=0, hi='none', s=0)
+                mc.setAttr(particle_inst_group + '.v', 1)
+                om.MFnTransform(get_mobjs(particle_inst_group)).set(om.MTransformationMatrix(rel_mats[i]))
+                mc.setKeyframe([particle_inst_group], bd=0, hi='none', cp=0, s=0)
+
             # hide all other children (instances)
-            children = mc.listRelatives(particle_grp, c=1, type='transform',
-                                        f=1)
+            children = mc.listRelatives(particle_grp, c=1, type='transform', f=1)
             if not children:
                 children = []
             for c in children:
                 if c not in p_inst_grps:
-                    mc.setKeyframe([c], at='v', v=0, hi='none', s=0)
+                    mc.setKeyframe([c], at='v', hi='none', s=0, v=0, t=mc.currentTime(q=1))
 
             # and make the instances visible
-            if p_inst_grps:
-                mc.setKeyframe(list(p_inst_grps), at='v', v=1, hi='none', s=0,
-                        t=mc.currentTime(q=1))
+            #if p_inst_grps:
+                #mc.setKeyframe(list(p_inst_grps), at='v', v=1, hi='none', s=0,
+                        #t=mc.currentTime(q=1))
 
         # hide particles that have died
         for pid in old_pid_array:
             if pid not in pid_array:
                 particle_grp = pid_groups[pid]
-                mc.setKeyframe([particle_grp], at='v', v=0, hi='none', s=0,
-                        t=mc.currentTime(q=1))
+                mc.setKeyframe([particle_grp], at='v', hi='none', s=0, v=0, t=mc.currentTime(q=1))
         old_pid_array = pid_array
 
 
 def main():
     bake_particle_inst('instancer1')
 
+
 if __name__ == '__main__':
     main()
+
