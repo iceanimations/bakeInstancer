@@ -1,4 +1,9 @@
+''' 
+@file bake_particle_instancer.py
 
+This file contains functions to bake an instancer into a structure of
+transforms containing instances
+'''
 import maya.cmds as mc
 import maya.OpenMaya as om
 import maya.OpenMayaFX as omfx
@@ -115,7 +120,10 @@ def bake_particle_inst(inst):
 
     inst_main_grp = get_inst_main_grp(inst)
     old_pid_array = []
-
+    # dictionary to store group names for particles
+    pid_groups = dict()
+    # dictionary to store group names for instances under particles
+    pid_insts = dict()
     for i in xrange(*get_playback_range()):
         # get all instances for this instancer
         mc.currentTime(i, e=1)
@@ -128,11 +136,6 @@ def bake_particle_inst(inst):
         pid_array = mc.getParticleAttr(inst_particle, at='particleId', array=True)
         if not pid_array:
             pid_array = []
-
-        # dictionary to store group names for particles
-        pid_groups = dict()
-        # dictionary to store group names for instances under particles
-        pid_insts = dict()
 
         for index, pid in enumerate(pid_array):
             # get all the instances for this particle
@@ -178,9 +181,10 @@ def bake_particle_inst(inst):
                 p_inst_grps.add(particle_inst_group)
 
                 # transform, make visible and key the particle-instance group
+                # hide before born
                 if not mc.keyframe(particle_inst_group, q=1, at='v', t=(mc.playbackOptions(q=1, ast=1), mc.currentTime(q=1)-1)):
                     mc.setKeyframe([particle_inst_group], at='v', t=mc.currentTime(q=1)-1, v=0, hi='none', s=0)
-                mc.setAttr(particle_inst_group + '.v', 1)
+                #mc.setAttr(particle_inst_group + '.v', 1)
                 om.MFnTransform(get_mobjs(particle_inst_group)).set(om.MTransformationMatrix(rel_mats[i]))
                 mc.setKeyframe([particle_inst_group], bd=0, hi='none', cp=0, s=0)
 
@@ -193,14 +197,15 @@ def bake_particle_inst(inst):
                     mc.setKeyframe([c], at='v', hi='none', s=0, v=0, t=mc.currentTime(q=1))
 
             # and make the instances visible
-            #if p_inst_grps:
-                #mc.setKeyframe(list(p_inst_grps), at='v', v=1, hi='none', s=0,
-                        #t=mc.currentTime(q=1))
+            if p_inst_grps:
+                mc.setKeyframe(list(p_inst_grps), at='v', v=1, hi='none', s=0,
+                        t=mc.currentTime(q=1))
 
         # hide particles that have died
         for pid in old_pid_array:
             if pid not in pid_array:
                 particle_grp = pid_groups[pid]
+                print "particle %i has died at t=%d: %s" % (pid, mc.currentTime(q=1), particle_grp)
                 mc.setKeyframe([particle_grp], at='v', hi='none', s=0, v=0, t=mc.currentTime(q=1))
         old_pid_array = pid_array
 
