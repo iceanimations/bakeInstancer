@@ -1,12 +1,56 @@
-''' 
+'''
 @file bake_particle_instancer.py
 
 This file contains functions to bake an instancer into a structure of
 transforms containing instances
+
+* task list
+** DONE bake at floating point frame steps
+** TODO bake more than one instancer at a time
+** TODO separate gather and create /passes/
+** TODO make a class structure of the baking script
+** TODO check possibilities of optimizing
+
+* Copyright [[http://www.iceanimations.com][ICE Animationasdfas Pvt. Ltd.]]
+
 '''
 import maya.cmds as mc
 import maya.OpenMaya as om
 import maya.OpenMayaFX as omfx
+
+from math import ceil
+
+
+## frange.py
+def frange(start, stop = None, step = 1):
+    """frange generates a set of floating point values over the 
+    range [start, stop) with step size step
+
+    frange([start,] stop [, step ])"""
+    if stop is None:
+        for x in xrange(int(ceil(start))):
+            yield x
+    else:
+        # create a generator expression for the index values
+        indices = (i for i in xrange(0, int((stop-start)/step)))  
+        # yield results
+        for i in indices:
+            yield start + step*i
+
+
+def get_playback_range():
+    ''' get_playback_range gets the current playback range from the maya scenes
+    into a tuple'''
+    start = mc.playbackOptions(q=1, min=1)
+    end = mc.playbackOptions(q=1, max=1)
+    return start, end+1
+
+
+def playback_frames(start=None, stop=None, step=1.0):
+    ''' return a generator for all the frames '''
+    if start is None or stop is None:
+        start, stop = get_playback_range()
+    return frange(start, stop, step)
 
 
 def get_mobjs(string, mobjs=False, dagpaths=True, plugs=False, list_all=False):
@@ -54,13 +98,6 @@ def get_mobjs(string, mobjs=False, dagpaths=True, plugs=False, list_all=False):
     return result
 
 
-def get_playback_range():
-    ''' get the current playback range in maya '''
-    start = mc.playbackOptions(q=1, min=1)
-    end = mc.playbackOptions(q=1, max=1)
-    return start, end+1
-
-
 def get_inst_main_grp(inst):
     ''' given the name of the instancer get an appropriate group to contain
     the baked structure '''
@@ -103,9 +140,10 @@ def get_particle_inst_grp(particle_group, dp):
     return dup
 
 
-def bake_particle_inst(inst):
+def bake_particle_inst(inst, step=1):
     ''' given the name of the instancer run the time line to gather the
-    information about the instancer and then create the structure for it '''
+    information about the instancer and then create the structure for it 
+    '''
     if not mc.objExists(inst):
         mc.error("Object %s does not exist" % inst)
     if mc.nodeType(inst) != 'instancer':
@@ -119,18 +157,25 @@ def bake_particle_inst(inst):
         mc.error("No particle Connected to instancer %s" % inst)
 
     inst_main_grp = get_inst_main_grp(inst)
+    mc.hide(inst_main_grp)
     old_pid_array = []
     # dictionary to store group names for particles
     pid_groups = dict()
     # dictionary to store group names for instances under particles
     pid_insts = dict()
-    for i in xrange(*get_playback_range()):
+
+    currentTime = 0
+    previousTime = None
+    for currentTime in playback_frames(step=step):
+        if previousTime is None:
+            previousTime = currentTime - step
+
         # get all instances for this instancer
-        mc.currentTime(i, e=1)
+        mc.currentTime(currentTime, e=1)
         dp_array = om.MDagPathArray()
         mat_array = om.MMatrixArray()
         si_array = om.MIntArray()
-        pi_array = om.MIntArray()
+        pi_array = om.MIntArray() 
         inst_fn.allInstances(dp_array, mat_array, si_array, pi_array)
         rel_mat_array = [dp_array[i].inclusiveMatrix() for i in range(dp_array.length())]
         pid_array = mc.getParticleAttr(inst_particle, at='particleId', array=True)
@@ -166,8 +211,8 @@ def bake_particle_inst(inst):
             mc.setKeyframe([particle_grp], bd=0, hi='none', cp=0, s=0, at='shear')
 
             # and hide it before this frame if there was no other keys
-            if not mc.keyframe(particle_grp, q=1, at='v', t=(mc.playbackOptions(q=1, ast=1), mc.currentTime(q=1)-1)):
-                mc.setKeyframe([particle_grp], at='v', t=mc.currentTime(q=1)-1, v=0, hi='none', s=0)
+            if not mc.keyframe(particle_grp, q=1, at='v', t=(mc.playbackOptions(q=1, ast=1), previousTime)):
+                mc.setKeyframe([particle_grp], at='v', t=previousTime, v=0, hi='none', s=0)
 
             # and add to its children the correspoding instances
             p_inst_grps = set()
@@ -182,8 +227,8 @@ def bake_particle_inst(inst):
 
                 # transform, make visible and key the particle-instance group
                 # hide before born
-                if not mc.keyframe(particle_inst_group, q=1, at='v', t=(mc.playbackOptions(q=1, ast=1), mc.currentTime(q=1)-1)):
-                    mc.setKeyframe([particle_inst_group], at='v', t=mc.currentTime(q=1)-1, v=0, hi='none', s=0)
+                if not mc.keyframe(particle_inst_group, q=1, at='v', t=(mc.playbackOptions(q=1, ast=1), previousTime)):
+                    mc.setKeyframe([particle_inst_group], at='v', t=previousTime, v=0, hi='none', s=0)
                 #mc.setAttr(particle_inst_group + '.v', 1)
                 om.MFnTransform(get_mobjs(particle_inst_group)).set(om.MTransformationMatrix(rel_mats[i]))
                 mc.setKeyframe([particle_inst_group], bd=0, hi='none', cp=0, s=0)
@@ -194,26 +239,26 @@ def bake_particle_inst(inst):
                 children = []
             for c in children:
                 if c not in p_inst_grps:
-                    mc.setKeyframe([c], at='v', hi='none', s=0, v=0, t=mc.currentTime(q=1))
+                    mc.setKeyframe([c], at='v', hi='none', s=0, v=0, t=currentTime)
 
-            # and make the instances visible
-            if p_inst_grps:
+            # and make the instances visible if p_inst_grps:
                 mc.setKeyframe(list(p_inst_grps), at='v', v=1, hi='none', s=0,
-                        t=mc.currentTime(q=1))
+                        t=currentTime)
 
         # hide particles that have died
         for pid in old_pid_array:
             if pid not in pid_array:
                 particle_grp = pid_groups[pid]
-                print "particle %i has died at t=%d: %s" % (pid, mc.currentTime(q=1), particle_grp)
-                mc.setKeyframe([particle_grp], at='v', hi='none', s=0, v=0, t=mc.currentTime(q=1))
+                mc.setKeyframe([particle_grp], at='v', hi='none', s=0, v=0, t=currentTime)
         old_pid_array = pid_array
+    mc.showHidden(inst_main_grp)
 
 
 def main():
-    bake_particle_inst('instancer1')
+    bake_particle_inst('instancer1', step=0.5)
 
 
 if __name__ == '__main__':
     main()
+
 
