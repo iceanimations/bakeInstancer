@@ -10,6 +10,7 @@ transforms containing instances
 ** TODO separate gather and create /passes/
 ** TODO make a class structure of the baking script
 ** TODO check possibilities of optimizing
+** TODO make GUI
 
 * Copyright [[http://www.iceanimations.com][ICE Animationasdfas Pvt. Ltd.]]
 
@@ -256,9 +257,3 @@ def bake_particle_inst(inst, step=1):
 
 def main():
     bake_particle_inst('instancer1', step=0.5)
-
-
-if __name__ == '__main__':
-    main()
-
-
