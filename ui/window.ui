@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>263</width>
-    <height>372</height>
+    <height>411</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Bake Instancer</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -39,12 +39,12 @@
          <x>0</x>
          <y>0</y>
          <width>243</width>
-         <height>126</height>
+         <height>165</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
-         <layout class="QVBoxLayout" name="instancesLayout"/>
+         <layout class="QVBoxLayout" name="instancersLayout"/>
         </item>
         <item>
          <layout class="QVBoxLayout" name="verticalLayout">
@@ -86,7 +86,7 @@
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QRadioButton" name="radioButton">
+        <widget class="QRadioButton" name="timeSliderButton">
          <property name="text">
           <string>Time Slider</string>
          </property>
@@ -96,7 +96,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QRadioButton" name="radioButton_2">
+        <widget class="QRadioButton" name="startEndButton">
          <property name="text">
           <string>Start/End Frames</string>
          </property>
@@ -112,7 +112,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit">
+          <widget class="QLineEdit" name="startBox">
            <property name="enabled">
             <bool>false</bool>
            </property>
@@ -132,7 +132,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit_2">
+          <widget class="QLineEdit" name="endBox">
            <property name="enabled">
             <bool>false</bool>
            </property>
@@ -169,9 +169,12 @@
           </widget>
          </item>
          <item>
-          <widget class="QDoubleSpinBox" name="doubleSpinBox">
+          <widget class="QDoubleSpinBox" name="stepBox">
            <property name="decimals">
             <number>1</number>
+           </property>
+           <property name="minimum">
+            <double>0.500000000000000</double>
            </property>
            <property name="singleStep">
             <double>0.500000000000000</double>
@@ -218,21 +221,57 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_2">
+       <widget class="QPushButton" name="bakeButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>75</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string>Bake</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_3">
+       <widget class="QPushButton" name="refreshButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>75</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string>Refresh</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QPushButton" name="closeButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>75</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string>Close</string>
         </property>
@@ -257,50 +296,50 @@
  <resources/>
  <connections>
   <connection>
-   <sender>radioButton_2</sender>
+   <sender>startEndButton</sender>
    <signal>toggled(bool)</signal>
-   <receiver>lineEdit</receiver>
+   <receiver>startBox</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>44</x>
-     <y>267</y>
+     <x>63</x>
+     <y>312</y>
     </hint>
     <hint type="destinationlabel">
-     <x>88</x>
-     <y>303</y>
+     <x>145</x>
+     <y>339</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>radioButton_2</sender>
+   <sender>startEndButton</sender>
    <signal>toggled(bool)</signal>
-   <receiver>lineEdit_2</receiver>
+   <receiver>endBox</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>95</x>
-     <y>270</y>
+     <x>114</x>
+     <y>312</y>
     </hint>
     <hint type="destinationlabel">
-     <x>231</x>
-     <y>304</y>
+     <x>359</x>
+     <y>339</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>pushButton</sender>
+   <sender>closeButton</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>292</x>
-     <y>364</y>
+     <x>468</x>
+     <y>400</y>
     </hint>
     <hint type="destinationlabel">
-     <x>17</x>
-     <y>365</y>
+     <x>177</x>
+     <y>401</y>
     </hint>
    </hints>
   </connection>
