@@ -241,8 +241,7 @@ def bake_particle_inst(inst, step=1):
             for c in children:
                 if c not in p_inst_grps:
                     mc.setKeyframe([c], at='v', hi='none', s=0, v=0, t=currentTime)
-
-            # and make the instances visible if p_inst_grps:
+                # and make the instances visible if p_inst_grps:
                 mc.setKeyframe(list(p_inst_grps), at='v', v=1, hi='none', s=0,
                         t=currentTime)
 
