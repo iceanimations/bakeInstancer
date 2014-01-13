@@ -26,10 +26,17 @@ class Window(Form, Base):
         self.instancers = []
         
     def switchSelectAll(self):
-        pass
+        select = True
+        for inst in self.instancers:
+            if inst.isChecked():
+                pass
+            else: select = False; break
+        self.selectAllButton.setChecked(select)
         
     def selectAll(self):
-        pass
+        select = self.selectAllButton.isChecked()
+        for inst in self.instancers:
+            inst.setChecked(select)
         
     def listInstancers(self):
         pass
