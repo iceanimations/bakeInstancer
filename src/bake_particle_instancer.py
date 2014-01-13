@@ -22,6 +22,10 @@ import maya.OpenMayaFX as omfx
 from math import ceil
 
 
+def instancers():
+    """returns all the instancers from a maya scene"""
+    return mc.ls(type = "instancer")
+
 ## frange.py
 def frange(start, stop = None, step = 1):
     """frange generates a set of floating point values over the 
@@ -176,7 +180,7 @@ def bake_particle_inst(inst, step=1):
         dp_array = om.MDagPathArray()
         mat_array = om.MMatrixArray()
         si_array = om.MIntArray()
-        pi_array = om.MIntArray() 
+        pi_array = om.MIntArray()
         inst_fn.allInstances(dp_array, mat_array, si_array, pi_array)
         rel_mat_array = [dp_array[i].inclusiveMatrix() for i in range(dp_array.length())]
         pid_array = mc.getParticleAttr(inst_particle, at='particleId', array=True)

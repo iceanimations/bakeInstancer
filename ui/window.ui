@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>263</width>
-    <height>411</height>
+    <width>328</width>
+    <height>422</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,12 +23,22 @@
      </widget>
     </item>
     <item>
+     <widget class="QCheckBox" name="selectAllButton">
+      <property name="text">
+       <string>Select All</string>
+      </property>
+     </widget>
+    </item>
+    <item>
      <widget class="QScrollArea" name="scrollArea">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
+      </property>
+      <property name="toolTip">
+       <string>List of Instancers</string>
       </property>
       <property name="widgetResizable">
        <bool>true</bool>
@@ -38,8 +48,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>243</width>
-         <height>165</height>
+         <width>308</width>
+         <height>153</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -87,6 +97,9 @@
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <widget class="QRadioButton" name="timeSliderButton">
+         <property name="toolTip">
+          <string>Get the start and end frames from time slider</string>
+         </property>
          <property name="text">
           <string>Time Slider</string>
          </property>
@@ -97,6 +110,9 @@
        </item>
        <item>
         <widget class="QRadioButton" name="startEndButton">
+         <property name="toolTip">
+          <string>Specify the start and end frames</string>
+         </property>
          <property name="text">
           <string>Start/End Frames</string>
          </property>
@@ -122,6 +138,9 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="toolTip">
+            <string>Start frame</string>
+           </property>
           </widget>
          </item>
          <item>
@@ -142,6 +161,9 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="toolTip">
+            <string>End frame</string>
+           </property>
           </widget>
          </item>
          <item>
@@ -161,6 +183,9 @@
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <property name="spacing">
+          <number>2</number>
+         </property>
          <item>
           <widget class="QLabel" name="label_3">
            <property name="text">
@@ -170,17 +195,27 @@
          </item>
          <item>
           <widget class="QDoubleSpinBox" name="stepBox">
+           <property name="toolTip">
+            <string>Keys per frame</string>
+           </property>
            <property name="decimals">
-            <number>1</number>
+            <number>2</number>
            </property>
            <property name="minimum">
-            <double>0.500000000000000</double>
+            <double>0.010000000000000</double>
            </property>
            <property name="singleStep">
-            <double>0.500000000000000</double>
+            <double>0.100000000000000</double>
            </property>
            <property name="value">
             <double>1.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>/Frame</string>
            </property>
           </widget>
          </item>
@@ -234,6 +269,9 @@
           <height>0</height>
          </size>
         </property>
+        <property name="toolTip">
+         <string>Bake the instancer (Assign keys)</string>
+        </property>
         <property name="text">
          <string>Bake</string>
         </property>
@@ -252,6 +290,9 @@
           <width>75</width>
           <height>0</height>
          </size>
+        </property>
+        <property name="toolTip">
+         <string>Relist the instancers</string>
         </property>
         <property name="text">
          <string>Refresh</string>
@@ -272,6 +313,9 @@
           <height>0</height>
          </size>
         </property>
+        <property name="toolTip">
+         <string>Close this window</string>
+        </property>
         <property name="text">
          <string>Close</string>
         </property>
@@ -286,7 +330,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>263</width>
+     <width>328</width>
      <height>21</height>
     </rect>
    </property>
@@ -303,11 +347,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>63</x>
-     <y>312</y>
+     <y>295</y>
     </hint>
     <hint type="destinationlabel">
      <x>145</x>
-     <y>339</y>
+     <y>322</y>
     </hint>
    </hints>
   </connection>
@@ -319,11 +363,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>114</x>
-     <y>312</y>
+     <y>295</y>
     </hint>
     <hint type="destinationlabel">
-     <x>359</x>
-     <y>339</y>
+     <x>294</x>
+     <y>322</y>
     </hint>
    </hints>
   </connection>
@@ -334,12 +378,28 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>468</x>
-     <y>400</y>
+     <x>294</x>
+     <y>383</y>
     </hint>
     <hint type="destinationlabel">
      <x>177</x>
      <y>401</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>startEndButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>startBox</receiver>
+   <slot>setFocus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>47</x>
+     <y>286</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>86</x>
+     <y>307</y>
     </hint>
    </hints>
   </connection>
