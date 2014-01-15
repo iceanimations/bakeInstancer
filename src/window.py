@@ -91,6 +91,9 @@ class Window(Form, Base):
                 return
             startFrame = int(str(startText))
             endFrame = int(str(endText))
+            if startFrame >= endFrame:
+                self.makeWidgetBlink(self.endBox)
+                return
         step = self.stepBox.value()
         instancers = []
         for inst in self.instancers:

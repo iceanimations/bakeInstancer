@@ -1,3 +1,3 @@
-import src.window as window
-reload(window)
-win = window.Window()
+import src.window as win
+reload(win)
+window = win.Window()
