@@ -35,6 +35,11 @@ class Window(Form, Base):
         self.startBox.setValidator(validator)
         self.endBox.setValidator(validator)
         
+        # update the database, how many times this app is used
+        site.addsitedir(r'r:/pipe_repo/users/qurban')
+        import appUsageApp
+        appUsageApp.updateDatabase('bakeInstancer')
+        
     def switchSelectAll(self):
         """checks the selectAllButton if users checks all
         the instancers on window"""
