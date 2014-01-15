@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>328</width>
-    <height>422</height>
+    <width>374</width>
+    <height>448</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -48,8 +48,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>308</width>
-         <height>153</height>
+         <width>354</width>
+         <height>179</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -300,6 +300,16 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="resetButton">
+        <property name="toolTip">
+         <string>Reset all the values of the window to default</string>
+        </property>
+        <property name="text">
+         <string>Reset</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="closeButton">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -330,7 +340,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>328</width>
+     <width>374</width>
      <height>21</height>
     </rect>
    </property>
