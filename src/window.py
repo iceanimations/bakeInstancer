@@ -1,12 +1,14 @@
 import site
 site.addsitedir(r"R:/Python_Scripts")
 from PyQt4.QtGui import *
+from PyQt4.QtCore import *
 import plugins.utilities as utils
 import bake_particle_instancer as bpi
 from PyQt4 import uic
 import os
 osp = os.path
 import sys
+import time
 
 selfPath = sys.modules[__name__].__file__
 rootPath = osp.dirname(osp.dirname(selfPath))
@@ -18,14 +20,20 @@ class Window(Form, Base):
         super(Window, self).__init__(parent)
         self.setupUi(self)
         
+        # instance variables
+        self.instancers = []
+        
         # bindings
         self.bakeButton.clicked.connect(self.bake)
         self.refreshButton.clicked.connect(self.refresh)
         self.selectAllButton.clicked.connect(self.selectAll)
-        self.resetButton.clicked.connect(self.resetWindow())
+        self.resetButton.clicked.connect(self.resetWindow)
         
-        #variables
-        self.instancers = []
+        # widgets' settings
+        validator = QIntValidator(self)
+        validator.setBottom(0)
+        self.startBox.setValidator(validator)
+        self.endBox.setValidator(validator)
         
     def switchSelectAll(self):
         """checks the selectAllButton if users checks all
@@ -64,6 +72,7 @@ class Window(Form, Base):
         for inst in instancers:
             name = inst.split(":")[-1]
             btn = QCheckBox(inst, self)
+            btn.setObjectName(inst)
             btn.clicked.connect(self.switchSelectAll)
             self.instancersLayout.addWidget(btn)
             self.instancers.append(btn)
@@ -71,9 +80,40 @@ class Window(Form, Base):
     def bake(self):
         startFrame = None
         endFrame = None
-        step = None
-        
+        if self.startEndButton.isChecked():
+            startText = self.startBox.text()
+            endText = self.endBox.text()
+            if not startText:
+                self.makeWidgetBlink(self.startBox)
+                return
+            if not endText:
+                self.makeWidgetBlink(self.endBox)
+                return
+            startFrame = int(str(startText))
+            endFrame = int(str(endText))
+        step = self.stepBox.value()
+        instancers = []
+        for inst in self.instancers:
+            if inst.isChecked():
+                instancers.append(str(inst.objectName()))
+        if not instancers:
+            self.makeWidgetBlink(self.scrollArea)
+            return
+        for instancer in instancers:
+            bpi.bake_particle_inst(instancer, step, startFrame, endFrame)
         
     def refresh(self):
         self.clearInstancers()
         self.listInstancers()
+        
+    def makeWidgetBlink(self, widget):
+        """Makes the given widget blink with red color"""
+        ss = widget.styleSheet()
+        for i in range(3):
+            widget.setStyleSheet("border: 1px solid red;")
+            widget.repaint()
+            time.sleep(0.1)
+            widget.setStyleSheet("border: None")
+            widget.repaint()
+            time.sleep(0.1)
+        widget.setStyleSheet(ss)

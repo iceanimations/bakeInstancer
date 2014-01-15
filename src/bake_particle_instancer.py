@@ -145,7 +145,7 @@ def get_particle_inst_grp(particle_group, dp):
     return dup
 
 
-def bake_particle_inst(inst, step=1):
+def bake_particle_inst(inst, step=1, startFrame = None, endFrame = None):
     ''' given the name of the instancer run the time line to gather the
     information about the instancer and then create the structure for it 
     '''
@@ -171,7 +171,7 @@ def bake_particle_inst(inst, step=1):
 
     currentTime = 0
     previousTime = None
-    for currentTime in playback_frames(step=step):
+    for currentTime in playback_frames(startFrame, endFrame, step=step):
         if previousTime is None:
             previousTime = currentTime - step
 
@@ -256,7 +256,3 @@ def bake_particle_inst(inst, step=1):
                 mc.setKeyframe([particle_grp], at='v', hi='none', s=0, v=0, t=currentTime)
         old_pid_array = pid_array
     mc.showHidden(inst_main_grp)
-
-
-def main():
-    bake_particle_inst('instancer1', step=0.5)

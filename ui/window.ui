@@ -202,7 +202,7 @@
             <number>2</number>
            </property>
            <property name="minimum">
-            <double>0.010000000000000</double>
+            <double>0.100000000000000</double>
            </property>
            <property name="singleStep">
             <double>0.100000000000000</double>
@@ -301,6 +301,12 @@
       </item>
       <item>
        <widget class="QPushButton" name="resetButton">
+        <property name="minimumSize">
+         <size>
+          <width>75</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="toolTip">
          <string>Reset all the values of the window to default</string>
         </property>
