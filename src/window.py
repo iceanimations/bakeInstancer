@@ -34,6 +34,7 @@ class Window(Form, Base):
         validator.setBottom(0)
         self.startBox.setValidator(validator)
         self.endBox.setValidator(validator)
+        self.listInstancers()
         
         # update the database, how many times this app is used
         site.addsitedir(r'r:/pipe_repo/users/qurban')
