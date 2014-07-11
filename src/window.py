@@ -44,6 +44,12 @@ class Window(Form, Base):
         import appUsageApp
         appUsageApp.updateDatabase('bakeInstancer')
         
+    def closeEvent(self, event):
+        self.deleteLater()
+        
+    def hideEvent(self, event):
+        self.close()
+        
     def switchSelectAll(self):
         """checks the selectAllButton if users checks all
         the instancers on window"""
