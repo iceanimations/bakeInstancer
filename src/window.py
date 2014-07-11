@@ -1,10 +1,13 @@
 import site
-site.addsitedir(r"R:/Python_Scripts")
+site.addsitedir(r"R:/Pipe_Repo/Users/Qurban/Utilities")
+try:
+    from uiContainer import uic
+except:
+    from PyQt4 import uic
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 import plugins.utilities as utils
 import bake_particle_instancer as bpi
-from PyQt4 import uic
 import os
 osp = os.path
 import sys
