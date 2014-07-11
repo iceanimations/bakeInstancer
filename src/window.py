@@ -6,7 +6,7 @@ except:
     from PyQt4 import uic
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
-import plugins.utilities as utils
+import qtify_maya_window as qtfy
 import bake_particle_instancer as bpi
 import os
 osp = os.path
@@ -19,7 +19,7 @@ uiPath = osp.join(rootPath, 'ui')
 
 Form, Base = uic.loadUiType(osp.join(uiPath, 'window.ui'))
 class Window(Form, Base):
-    def __init__(self, parent= utils.getMayaWindow()):
+    def __init__(self, parent= qtfy.getMayaWindow()):
         super(Window, self).__init__(parent)
         self.setupUi(self)
         
